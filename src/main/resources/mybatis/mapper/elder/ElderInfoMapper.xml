@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.redinfo.biz.elder.dao.ElderInfoDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.redinfo.biz.elder.oo.po.ElderInfo">
+        <id column="id" property="id" />
+        <result column="elder_name" property="elderName" />
+        <result column="elder_tel" property="elderTel" />
+        <result column="id_card" property="idCard" />
+        <result column="url" property="url" />
+        <result column="card_url" property="cardUrl" />
+        <result column="birthday" property="birthday" />
+        <result column="gender" property="gender" />
+        <result column="native_place" property="nativePlace" />
+        <result column="nation" property="nation" />
+        <result column="address" property="address" />
+        <result column="disease" property="disease" />
+        <result column="contagion" property="contagion" />
+        <result column="other_disease" property="otherDisease" />
+        <result column="allergy" property="allergy" />
+        <result column="health_status" property="healthStatus" />
+        <result column="area_id" property="areaId" />
+        <result column="org_id" property="orgId" />
+        <result column="pension_type" property="pensionType" />
+        <result column="linkman_name" property="linkmanName" />
+        <result column="linkman_tel" property="linkmanTel" />
+        <result column="is_del" property="isDel" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, elder_name, elder_tel, id_card, url, card_url, birthday, gender, native_place, nation, address, disease, contagion, other_disease, allergy, health_status, area_id, org_id, pension_type, linkman_name, linkman_tel, is_del, gmt_create, gmt_modified, remark
+    </sql>
+    
+    <insert id="insertElderInfo" parameterType="List">
+        INSERT INTO elder_info(
+        id, elder_name, elder_tel, id_card, birthday, gender, native_place, nation, address, disease, 
+        area_id, pension_type, linkman_name, linkman_tel) 
+        VALUES
+        <foreach collection="list" item="param" separator=",">
+         (
+         #{param.id}, #{param.elderName}, #{param.elderTel}, #{param.idCard}, #{param.birthday}, #{param.gender},
+         #{param.nativePlace}, #{param.nation}, #{param.address}, #{param.disease}, #{param.areaId}, 
+         #{param.pensionType}, #{param.linkmanName}, #{param.linkmanTel}
+         )
+        </foreach>
+    </insert>
+    <insert id="insertElderInfoServ" parameterType="java.util.ArrayList">
+        INSERT INTO elder_info_serv(
+        elder_id, qr_code, sub_lvl, current_situation, sub_account, is_location,lng,lat,elder_type) 
+        VALUES
+         <foreach collection="list" item="param" separator=",">
+        (#{param.id}, #{param.qrCode}, #{param.subLvl}, #{param.currentSituation},#{param.subAccount},
+        #{param.isLocation},#{param.lng},#{param.lat},#{param.elderType})
+        </foreach>
+    </insert>
+    <insert id="insertElderInfoMember" parameterType="java.util.ArrayList">
+        INSERT INTO elder_info_member(elder_id, name, kinship, tel) 
+        VALUES
+        <foreach collection="list" item="elder" separator=",">
+	        <foreach collection="elder.memList" item="param" separator=",">
+	        (#{elder.id}, #{param.name}, #{param.kinship}, #{param.tel})
+	        </foreach>
+        </foreach>
+    </insert>
+    
+    <insert id='createElderInsertSub' parameterType="java.util.ArrayList">
+        INSERT INTO elder_sub_his(elder_id,sub_lvl,start_time,pension_type,is_effective)
+        VALUES
+        <foreach collection="list" item="param" separator=",">
+         (#{param.id}, #{param.subLvl}, NOW(), #{param.pensionType}, 1)
+        </foreach>
+    </insert>
+
+</mapper>

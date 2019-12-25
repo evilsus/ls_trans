@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.redinfo.biz.ba.dao.BasArchivesDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="ElderMap" type="cn.redinfo.biz.elder.oo.po.ElderInfo">
+        <id column="id" property="id" />
+        <result column="elder_name" property="elderName" />
+        <result column="elder_tel" property="elderTel" />
+        <result column="id_card" property="idCard" />
+        <result column="url" property="url" />
+        <result column="card_url" property="cardUrl" />
+        <result column="birthday" property="birthday" />
+        <result column="gender" property="gender" />
+        <result column="native_place" property="nativePlace" />
+        <result column="nation" property="nation" />
+        <result column="address" property="address" />
+        <result column="disease" property="disease" />
+        <result column="contagion" property="contagion" />
+        <result column="other_disease" property="otherDisease" />
+        <result column="allergy" property="allergy" />
+        <result column="health_status" property="healthStatus" />
+        <result column="area_id" property="areaId" />
+        <result column="org_id" property="orgId" />
+        <result column="pension_type" property="pensionType" />
+        <result column="linkman_name" property="linkmanName" />
+        <result column="linkman_tel" property="linkmanTel" />
+        <result column="is_del" property="isDel" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+        <result column="remark" property="remark" />
+        <result column="elder_id" property="elderId" />
+        <result column="qr_code" property="qrCode" />
+        <result column="lng" property="lng" />
+        <result column="lat" property="lat" />
+        <result column="is_location" property="isLocation" />
+        <result column="collect_id" property="collectId" />
+        <result column="sub_lvl" property="subLvl" />
+        <result column="per_account" property="perAccount" />
+        <result column="sub_account" property="subAccount" />
+        <result column="selfcare_ability" property="selfcareAbility" />
+        <result column="elder_type" property="elderType" />
+        <result column="current_situation" property="currentSituation" />
+        <result column="is_plan" property="isPlan" />
+        <collection property="memList" ofType="cn.redinfo.biz.elder.oo.po.ElderInfoMember" javaType="ArrayList">
+            <result column="name" property="name" />
+            <result column="kinship" property="kinship" />
+            <result column="tel" property="tel" />
+        </collection>
+    </resultMap>
+
+    
+    <select id='getElder' parameterType="java.lang.Integer" resultMap="ElderMap">
+		SELECT ba.autoId id,arcName elder_name,idCard id_card,(CASE WHEN mobile LIKE '10000%' THEN '' ELSE mobile END) elder_tel,
+		CONCAT(SUBSTR(idCard FROM 7 FOR 4),'-',SUBSTR(idCard FROM 11 FOR 2),'-',SUBSTR(idCard FROM 13 FOR 2)) birthday,
+		gender,registerAdd native_place,nation,address,disease,areaId area_id,
+		(CASE WHEN subsidyGrade=5 THEN 0 ELSE 1 END) pension_type,
+		contact linkman_name,(CASE WHEN contactTel LIKE '10000%' THEN '' ELSE contactTel END) linkman_tel,
+		lng,lat,remainder sub_account,qCode qr_code,
+		(CASE WHEN loFlag=1 THEN 0 ELSE 1 END) is_location,
+		(CASE WHEN able=0 THEN 5 WHEN able=1 THEN 0 WHEN able=2 THEN 2 WHEN able=3 THEN 1 WHEN able=4 THEN 3 WHEN able=5 THEN 4 
+		END) current_situation,
+		(CASE WHEN subsidyGrade=1 THEN 3 WHEN subsidyGrade=2 THEN 2 WHEN subsidyGrade=3 THEN 1 WHEN subsidyGrade=6 THEN 4 
+        WHEN subsidyGrade=7 THEN 4 END) sub_lvl,
+        (CASE WHEN planLength=1 THEN 5 WHEN subsidyGrade=1 THEN 3 WHEN subsidyGrade=2 THEN 2 WHEN subsidyGrade=3 THEN 1 WHEN subsidyGrade=6 THEN 4 
+        WHEN subsidyGrade=7 THEN 4 END) elder_type,
+		bm.relationName name,bm.relationShip kinship,bm.phone tel
+		FROM bas_archives ba 
+		LEFT JOIN bas_member bm ON bm.arcId=ba.autoId AND bm.phone NOT LIKE '10000%'
+		WHERE ba.autoId > #{id} AND ba.isHistory=0 ORDER BY ba.autoId
+		LIMIT #{size}
+    </select>
+
+</mapper>
